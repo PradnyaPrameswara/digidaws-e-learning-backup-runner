@@ -11,6 +11,8 @@ if [[ -z "$BACKUP_DATABASE_URL" ]]; then
 fi
 
 umask 077
+# The runner image also ships an older default client; the server is PostgreSQL 17.
+export PATH="/usr/lib/postgresql/17/bin:$PATH"
 
 : "${BACKUP_ENV:?}" "${AGE_RECIPIENTS:?}" "${GH_TOKEN:?}" "${BACKUP_REPO:?}"
 export GH_REPO="$BACKUP_REPO"
