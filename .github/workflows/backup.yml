@@ -5,6 +5,8 @@ on:
     - cron: '*/15 * * * *'
   workflow_dispatch:
 
+# Backups are stored as release assets of the PRIVATE repository in BACKUP_REPO, written with a fine-grained
+# token scoped to that repository only. Nothing is written to this public repository or to Cloudflare R2.
 permissions:
   contents: read
 
@@ -14,7 +16,7 @@ concurrency:
 
 jobs:
   backup:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -28,13 +30,12 @@ jobs:
           sudo apt-get install -y -qq postgresql-common age
           sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y >/dev/null
           sudo apt-get install -y -qq postgresql-client-17
-      - name: Export, encrypt, upload
+      - name: Export, encrypt, store, verify
         env:
           BACKUP_ENV: ${{ matrix.target }}
           PROD_DATABASE_URL: ${{ secrets.PROD_BACKUP_DATABASE_URL }}
           STAGING_DATABASE_URL: ${{ secrets.STAGING_BACKUP_DATABASE_URL }}
-          AGE_RECIPIENT: ${{ secrets.BACKUP_AGE_RECIPIENT }}
-          INGEST_URL: ${{ secrets.BACKUP_INGEST_URL }}
-          INGEST_TOKEN: ${{ secrets.BACKUP_INGEST_TOKEN }}
-          STATUS_TOKEN: ${{ secrets.BACKUP_STATUS_TOKEN }}
-        run: bash backup.sh
+          # Independent recovery recipient (Drive identity + owner passphrase) and historical recipient.
+          AGE_RECIPIENTS: ${{ vars.BACKUP_AGE_RECIPIENTS }}
+          BACKUP_REPO: PradnyaPrameswara/digidaws-backups
+          GH_TOKEN: ${{ secrets.BACKUP_STORE_TOKEN }}
