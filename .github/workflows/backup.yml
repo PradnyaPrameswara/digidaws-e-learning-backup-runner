@@ -39,3 +39,5 @@ jobs:
           AGE_RECIPIENTS: ${{ vars.BACKUP_AGE_RECIPIENTS }}
           BACKUP_REPO: PradnyaPrameswara/digidaws-backups
           GH_TOKEN: ${{ secrets.BACKUP_STORE_TOKEN }}
+          RETENTION_DAYS: '30'
+        run: bash backup.sh
