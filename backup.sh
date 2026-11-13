@@ -33,7 +33,7 @@ name="${BACKUP_ENV}-${stamp}.pgdump.age"
 
 export PGSSLMODE=verify-full PGSSLROOTCERT="$PWD/supabase-root-2021.crt" PGCONNECT_TIMEOUT=20
 pg_dump --dbname="$BACKUP_DATABASE_URL" --format=custom --compress=6 \
-  --schema=auth --schema=public --schema=private --schema=storage --schema=supabase_migrations \
+  --schema=auth --schema=public --schema=private --schema=request_guard --schema=storage --schema=supabase_migrations \
   --file="$work/dump.pgdump" 2>"$work/pg_dump.err" || { sed -E 's#(postgres(ql)?://)[^@ ]*@#\1***@#g' "$work/pg_dump.err" | tail -5; echo "pg_dump failed"; exit 1; }
 
 entries="$(pg_restore --list "$work/dump.pgdump" | grep -c '^[0-9]')"

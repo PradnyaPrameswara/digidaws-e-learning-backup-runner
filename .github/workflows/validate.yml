@@ -1,0 +1,17 @@
+name: Validate backup source
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check backup shell syntax without accessing infrastructure
+        run: bash -n backup.sh
